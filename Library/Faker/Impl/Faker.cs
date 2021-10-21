@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using Library.Generator;
@@ -40,7 +39,7 @@ namespace Library.Faker.Impl
             object instance = GetInstanceByConstructor(type);
             if (instance == null)
             {
-                GetDefaultValue(type);
+                return GetDefaultValue(type);
             }
 
             SetPublicFields(instance);
@@ -85,10 +84,26 @@ namespace Library.Faker.Impl
 
         private void SetPublicFields(object instance)
         {
+            Type type = instance.GetType();
+            foreach (var field in type.GetFields())
+            {
+                if (field.GetValue(instance) != GetDefaultValue(field.FieldType))
+                {
+                    field.SetValue(instance, Create(field.FieldType));
+                }
+            }
         }
-
+        
         private void SetPublicProperties(object instance)
         {
+            Type type = instance.GetType();
+            foreach (var property in type.GetProperties())
+            {
+                if (property.GetValue(instance) != GetDefaultValue(property.PropertyType))
+                {
+                    property.SetValue(instance, Create(property.PropertyType));
+                }
+            }
         }
     }
 }
