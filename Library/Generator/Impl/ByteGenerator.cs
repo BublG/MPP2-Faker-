@@ -7,7 +7,7 @@ namespace Library.Generator.Impl
     {
         private static Random _random = new Random();
         
-        public object GetValue(Type type, IFaker faker)
+        public object Generate(Type type, IFaker faker)
         {
             byte[] b = new byte[1];
             _random.NextBytes(b);

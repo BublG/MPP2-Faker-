@@ -7,7 +7,7 @@ namespace Library.Generator.Impl
     {
         private static Random _random = new Random();
 
-        public object GetValue(Type type, IFaker faker)
+        public object Generate(Type type, IFaker faker)
         {
             return new DateTime(_random.Next(1, 2100), _random.Next(1, 13), _random.Next(1, 29),
                 _random.Next(1, 24), _random.Next(1, 60), _random.Next(1, 60));

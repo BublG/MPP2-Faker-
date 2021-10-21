@@ -8,7 +8,7 @@ namespace Library.Generator.Impl
     {
         private static Random _random = new Random();
         private static string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        public object GetValue(Type type, IFaker faker)
+        public object Generate(Type type, IFaker faker)
         {
             return MakeRandomString(_random.Next(5, 15));
         }

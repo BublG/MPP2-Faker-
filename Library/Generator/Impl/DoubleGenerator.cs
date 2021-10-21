@@ -6,7 +6,7 @@ namespace Library.Generator.Impl
     public class DoubleGenerator : IGenerator
     {
         private static Random _random = new Random();
-        public object GetValue(Type type, IFaker faker)
+        public object Generate(Type type, IFaker faker)
         {
             return _random.NextDouble() * _random.Next();
         }
