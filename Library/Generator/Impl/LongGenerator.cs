@@ -1,4 +1,5 @@
 ﻿using System;
+using Library.Faker;
 
 namespace Library.Generator.Impl
 {
@@ -6,11 +7,16 @@ namespace Library.Generator.Impl
     {
         private static Random _random = new Random();
         
-        public object GetValue()
+        public object GetValue(Type type, IFaker faker)
         {
             byte[] b = new byte[8];
             _random.NextBytes(b);
             return BitConverter.ToInt64(b, 0);
+        }
+        
+        public bool CanGenerate(Type type)
+        {
+            return type == typeof(long);
         }
     }
 }

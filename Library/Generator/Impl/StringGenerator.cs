@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Library.Faker;
 
 namespace Library.Generator.Impl
 {
@@ -7,7 +8,7 @@ namespace Library.Generator.Impl
     {
         private static Random _random = new Random();
         private static string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        public object GetValue()
+        public object GetValue(Type type, IFaker faker)
         {
             return MakeRandomString(_random.Next(5, 15));
         }
@@ -16,6 +17,11 @@ namespace Library.Generator.Impl
         {
             return new string(Enumerable.Repeat(chars, length)
                 .Select(s => s[_random.Next(s.Length)]).ToArray());
+        }
+        
+        public bool CanGenerate(Type type)
+        {
+            return type == typeof(string);
         }
     }
 }
