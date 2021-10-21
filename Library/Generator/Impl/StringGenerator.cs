@@ -1,26 +1,21 @@
-﻿namespace Library.Generator.Impl
+﻿using System;
+using System.Linq;
+
+namespace Library.Generator.Impl
 {
     public class StringGenerator : IGenerator
     {
-        private static IGenerator _generator;
-
-        private StringGenerator()
-        {
-        }
-        
-        public static IGenerator GetInstance()
-        {
-            if (_generator == null)
-            {
-                _generator = new StringGenerator();
-            }
-
-            return _generator;
-        }
-        
+        private static Random _random = new Random();
+        private static string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         public object GetValue()
         {
-            return "abc";
+            return MakeRandomString(_random.Next(5, 15));
+        }
+        
+        private string MakeRandomString(int length)
+        {
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[_random.Next(s.Length)]).ToArray());
         }
     }
 }

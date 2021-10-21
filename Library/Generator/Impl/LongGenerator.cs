@@ -2,12 +2,15 @@
 
 namespace Library.Generator.Impl
 {
-    public class IntGenerator : IGenerator
+    public class LongGenerator : IGenerator
     {
         private static Random _random = new Random();
+        
         public object GetValue()
         {
-            return _random.Next();
+            byte[] b = new byte[8];
+            _random.NextBytes(b);
+            return BitConverter.ToInt64(b, 0);
         }
     }
 }

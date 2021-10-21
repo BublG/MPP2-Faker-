@@ -2,12 +2,13 @@
 
 namespace Library.Generator.Impl
 {
-    public class IntGenerator : IGenerator
+    public class FloatGenerator : IGenerator
     {
         private static Random _random = new Random();
+        
         public object GetValue()
         {
-            return _random.Next();
+            return _random.NextDouble() * _random.Next(9999);
         }
     }
 }
