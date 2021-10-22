@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
+using Library.CustomException;
 using Library.Generator;
 using Library.Generator.Impl;
 
@@ -12,14 +15,22 @@ namespace Library.Faker.Impl
         {
             new BoolGenerator(),
             new ByteGenerator(),
-            new IntGenerator(),
             new LongGenerator(),
             new FloatGenerator(),
             new DoubleGenerator(),
             new StringGenerator(),
-            new DateTimeGenerator(),
             new ListGenerator()
         };
+
+        private static string _pluginsPath = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent
+                                                 .Parent.FullName + "/Library/Plugins";
+
+        private ISet<Type> _usedTypes = new HashSet<Type>();
+
+        public Faker()
+        {
+            InstallPlugins();
+        }
 
         public T Create<T>()
         {
@@ -36,6 +47,19 @@ namespace Library.Faker.Impl
                 }
             }
 
+            if (_usedTypes.Contains(type))
+            {
+                string classes = "";
+                foreach (var usedType in _usedTypes)
+                {
+                    classes += usedType.Name + ", ";
+                }
+
+                throw new СyclicalDependencyException("Cyclical dependency in classes: " + classes);
+            }
+
+            _usedTypes.Add(type);
+
             object instance = GetInstanceByConstructor(type);
             if (instance == null)
             {
@@ -44,6 +68,8 @@ namespace Library.Faker.Impl
 
             SetPublicFields(instance);
             SetPublicProperties(instance);
+            _usedTypes.Remove(type);
+
             return instance;
         }
 
@@ -73,7 +99,7 @@ namespace Library.Faker.Impl
                     {
                         return constructor.Invoke(parameters);
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                     }
                 }
@@ -87,21 +113,37 @@ namespace Library.Faker.Impl
             Type type = instance.GetType();
             foreach (var field in type.GetFields())
             {
-                if (field.GetValue(instance) != GetDefaultValue(field.FieldType))
+                if (Equals(field.GetValue(instance), GetDefaultValue(field.FieldType)))
                 {
                     field.SetValue(instance, Create(field.FieldType));
                 }
             }
         }
-        
+
         private void SetPublicProperties(object instance)
         {
             Type type = instance.GetType();
             foreach (var property in type.GetProperties())
             {
-                if (property.GetValue(instance) != GetDefaultValue(property.PropertyType))
+                if (Equals(property.GetValue(instance), GetDefaultValue(property.PropertyType)))
                 {
                     property.SetValue(instance, Create(property.PropertyType));
+                }
+            }
+        }
+
+        private void InstallPlugins()
+        {
+            var pluginFiles = Directory.GetFiles(_pluginsPath, "*.dll");
+            foreach (var file in pluginFiles)
+            {
+                Assembly asm = Assembly.LoadFrom(file);
+                var types = asm.GetTypes()
+                    .Where(t => t.GetInterfaces()
+                        .Any(i => i.FullName == typeof(IGenerator).FullName));
+                foreach (var type in types)
+                {
+                    _generators.Add(asm.CreateInstance(type.FullName) as IGenerator);
                 }
             }
         }

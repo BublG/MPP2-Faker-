@@ -9,15 +9,25 @@
         {
             Name = name;
         }
-
+        
         public Person(string name, int age)
         {
             Name = name;
             Age = age;
         }
         
+        public Person(int age)
+        {
+            Age = age;
+        }
+        
         public Person()
         {
         }
+
+        // private Person()
+        // {
+        //     
+        // }
     }
 }
